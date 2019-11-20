@@ -10,9 +10,9 @@ class Qinghi(object):
     _action: AnyStr
 
     def __init__(self, widget: Widget, action: AnyStr, extras: dict):
-        self._widget = widget
+        self._widget = widget()
         self._action = action
         self._extras =extras
 
     def execute(self):
-        self._widget(self._action, self._extras)
+        self._widget.action(action=self._action, params=self._extras)

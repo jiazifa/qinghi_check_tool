@@ -41,4 +41,4 @@ def main():
     namespace = parse(sys.argv[1:])
     qh = qinghi.Qinghi(widget=namespace.module,
                        action=namespace.action, extras=vars(namespace))
-    print(qh)
+    qh.execute()
