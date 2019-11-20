@@ -7,6 +7,12 @@ __version__ = '0.1.0'
 class Qinghi(object):
     _widget: Widget
     _extras: Dict[AnyStr, Any]
-    def __init__(self, widget: Widget, extras: dict):
+    _action: AnyStr
+
+    def __init__(self, widget: Widget, action: AnyStr, extras: dict):
         self._widget = widget
+        self._action = action
         self._extras =extras
+
+    def execute(self):
+        self._widget(self._action, self._extras)
