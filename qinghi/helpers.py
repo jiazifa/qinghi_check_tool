@@ -5,7 +5,8 @@ import os
 import json
 import sys
 from typing import Optional, List, Generator, Union, Pattern, Match, AnyStr, Dict, Any
-from qinghi.constant import BASE_URL, USER_CONFIG_PATH
+import requests
+from qinghi.constant import BASE_URL
 
 def is_type_check():  # type: () -> bool
     """ 判断是否可用类型检查 """
@@ -52,15 +53,4 @@ def header_for() -> Dict[AnyStr, AnyStr]:
     headers: Dict[AnyStr, AnyStr] = {}
     return headers
 
-def write_config(config: Dict[AnyStr, Any] = {}, target: AnyStr = USER_CONFIG_PATH):
-    with open(target, "w+") as f:
-        content = f.read()
-        prev: Dict[AnyStr, Any] = json.loads(content) or {}
-        prev.update(config)
-        json.dump(prev, f)
-
-def load_config(key: AnyStr, target: AnyStr = USER_CONFIG_PATH) -> Optional[Any]:
-    with open(target, "r") as f:
-        content = f.read()
-        config: Dict[AnyStr, Any] = json.loads(content) or {}
-        return config.get(key)
+session = requests.Session()

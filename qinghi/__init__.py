@@ -1,6 +1,7 @@
 #! -*- coding: utf-8 -*-
 from typing import Dict, AnyStr, List, Any
 from qinghi.widgets import User, Widget
+from qinghi.config import config
 
 __version__ = '0.1.0'
 

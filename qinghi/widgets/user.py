@@ -2,9 +2,8 @@
 
 from typing import AnyStr, Dict, Any, Callable
 from . import Widget
-from qinghi.helpers import platform, url_for, write_config
-import requests
-
+from qinghi import config
+from qinghi.helpers import platform, url_for, session
 
 class User(Widget):
     _actions: Dict[AnyStr, Callable]
@@ -27,5 +26,11 @@ class User(Widget):
             'detail': '机型：{platform} / 系统版本：{version}'.format(platform=platform(), version='13.1.2')
         }
         target = url_for(path=path)
-        resp = requests.post(target, params)
+        resp = session.post(target, params)
         result = resp.json()
+        config.token = result.get('token')
+        config.signature = result['user']['signature']
+        config.email = result['user']['email']
+        config.mobilephone = result['user']['mobilephone']
+        config.userId = result['user']['userId']
+        config.username = result['user']['username']
