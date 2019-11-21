@@ -6,6 +6,7 @@ import codecs
 from argparse import ArgumentParser
 from typing import Optional, Text, Sequence
 import qinghi
+from qinghi.config import Config
 
 
 def import_class(import_string):
@@ -31,14 +32,15 @@ def parse(args):
 
     parser.add_argument('-m', '--module', type=import_class,
                         default='qinghi.User', help='action you can choice')
-    parser.add_argument('-n', '--name', help='name for login')
-    parser.add_argument('-p', '--password', help='password for login')
+
+    parser.add_argument('-c', '--config', help='where is config file')
     parser.add_argument('-a', '--action', help='Action for module')
     return parser.parse_args(args=args)
 
 
 def main():
     namespace = parse(sys.argv[1:])
+    config = Config(namespace.config)
     qh = qinghi.Qinghi(widget=namespace.module,
-                       action=namespace.action, extras=vars(namespace))
+                       action=namespace.action, config=config)
     qh.execute()
