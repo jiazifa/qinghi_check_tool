@@ -9,6 +9,9 @@ class Config(object):
     # User
     mobilephone: Optional[AnyStr]
     password: Optional[AnyStr]
+    latitude: Optional[AnyStr]
+    longitude: Optional[AnyStr]
+    address: Optional[AnyStr]
 
     def __init__(self, path: AnyStr):
         self._source_file = path
@@ -20,3 +23,7 @@ class Config(object):
         sections = self._cf.sections()
         self.mobilephone = self._cf.get('User', 'mobilephone')
         self.password = self._cf.get('User', 'password')
+
+        self.latitude = self._cf.get('Location', 'latitude')
+        self.longitude = self._cf.get('Location', 'longitude')
+        self.address = self._cf.get('Location', 'address')

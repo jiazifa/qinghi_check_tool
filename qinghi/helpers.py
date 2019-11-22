@@ -19,6 +19,20 @@ def is_type_check():  # type: () -> bool
         return TYPE_CHECKING
 
 
+class _User(object):
+    __payload: Dict[AnyStr, Any] = {}
+
+    def __getattr__(self, attr: AnyStr) -> Optional[Any]:
+        return self.__payload.get(attr)
+
+    def __setattr__(self, key: AnyStr, value: Optional[Any]):
+        self.__payload.setdefault(key, value)
+
+
+user_config = _User()
+
+session = requests.Session()
+
 PLATFORM_IOS = [
     "iPhone 1G",
     "iPhone 3G",
@@ -56,20 +70,8 @@ def url_for(path: AnyStr, base: Optional[str] = None) -> AnyStr:
 
 def header_for() -> Dict[AnyStr, AnyStr]:
     headers: Dict[AnyStr, AnyStr] = {}
+    cookie: str = 'JSESSIONID={jsessionid};signature={signature};userId={userId}'.format(jsessionid=user_config.jsessionid, signature=user_config.signature, userId=user_config.userId)
+    headers.update({'Cookie': cookie})
+    headers.update({'Accept-Language': 'zh-Hans-CN;q=1, en-CN;q=0.9'})
+    headers.update({'User-Agent': 'QingHI/8.0.6 (iPhone; iOS 10.1.1; Scale/2.00)'})
     return headers
-
-
-session = requests.Session()
-
-
-class _User(object):
-    __payload: Dict[AnyStr, Any] = {}
-
-    def __getattr__(self, attr: AnyStr) -> Optional[Any]:
-        return self.__payload.get(attr)
-
-    def __setattr__(self, key: AnyStr, value: Optional[Any]):
-        self.__payload.setdefault(key, value)
-
-
-user_config = _User()

@@ -2,8 +2,9 @@
 
 from typing import AnyStr, Dict, Any, Callable, Optional
 from . import Widget
-from qinghi.helpers import platform, url_for, session, user_config
+from qinghi.helpers import platform, url_for, session, user_config, header_for
 from qinghi.config import Config
+
 
 class User(Widget):
     _actions: Dict[AnyStr, Any]
@@ -26,9 +27,9 @@ class User(Widget):
             'deviceType': '2',
             'detail': '机型：{platform} / 系统版本：{version}'.format(platform=platform(), version='13.1.2')
         }
-        print(params)
         target = url_for(path=path)
         resp = session.post(target, params)
+        user_config.jsessionid = resp.cookies["JSESSIONID"]
         result = resp.json()
         user_config.token = result.get('token')
         user_config.signature = result['user']['signature']
@@ -41,9 +42,26 @@ class User(Widget):
     def checkCurrentSign(self):
         path: str = 'mobileAttendance/nearestAttendanceSetting'
         target: str = url_for(path)
-        resp = session.get(target)
+        resp = session.get(target, headers=header_for())
         result = resp.json()
-        print(result)        
-    
-    def check_in_work(self):
-        pass
+        print(result)
+
+    def check_in_work(self, config: Config):
+        self.login(config)
+        path: str = 'workCenter/createAutomaticSignForAttendance'
+        target: str = url_for(path)
+        params: Dict[AnyStr, Any] = {
+            'attendance': {
+                'longitude': config.longitude,
+                'latitude': config.latitude,
+                'attendanceAddress': config.address,
+                'type': 'startwork',
+            },
+            'distance': '300.8334',
+            'isJSON': 'yes'
+        }
+        headers = header_for()
+        print(target, headers, params)
+        resp = session.post(target, params, headers=headers)
+        print(resp)
+        # result = resp.json()
