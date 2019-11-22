@@ -1,5 +1,5 @@
 #! -*- coding: utf-8 -*-
-
+import sys
 from typing import AnyStr, Dict, Any, Callable, Optional
 from . import Widget
 from qinghi.helpers import platform, url_for, session, user_config, header_for
@@ -13,6 +13,7 @@ class User(Widget):
         self._actions = {
             'login': self.login,
             'checkin': self.check_in_work,
+            'checkout': self.check_out_work,
         }
 
     def action(self, action: AnyStr, config: Optional[Config]):
@@ -52,16 +53,48 @@ class User(Widget):
         target: str = url_for(path)
         params: Dict[AnyStr, Any] = {
             'attendance': {
-                'longitude': config.longitude,
-                'latitude': config.latitude,
+                'longitude': float(config.longitude),
+                'latitude': float(config.latitude),
                 'attendanceAddress': config.address,
                 'type': 'startwork',
             },
-            'distance': '300.8334',
-            'isJSON': 'yes'
+            'distance': float(300.8334)
         }
         headers = header_for()
         print(target, headers, params)
-        resp = session.post(target, params, headers=headers)
-        print(resp)
-        # result = resp.json()
+        resp = session.post(target, json=params, headers=headers)
+        result: Dict[AnyStr, Any] = resp.json()
+        attendanceId: Optional[int] = result['attendanceId']
+        attendanceIsLate: bool = result['attendanceIsLate'] or False
+        result: bool = result['result'] or False
+        if not result:
+            print('已经打卡过了吧？')
+        else:
+            print('上班打卡成功')
+        sys.exit(0)
+
+    def check_out_work(self, config: Config) -> Dict[AnyStr, AnyStr]:
+        self.login(config)
+        path: str = 'workCenter/createAttendance_744'
+        target: str = url_for(path)
+        params: Dict[AnyStr, Any] = {
+            'attendance': {
+                'longitude': float(config.longitude),
+                'latitude': float(config.latitude),
+                'attendanceAddress': config.address,
+                'type': 'offwork',
+            },
+            'distance': float(300.8334)
+        }
+        headers = header_for()
+        print(target, headers, params)
+        resp = session.post(target, json=params, headers=headers)
+        result: Dict[AnyStr, Any] = resp.json()
+        print(result)
+        attendanceId: Optional[int] = result['attendanceId']
+        result: bool = result['result'] or False
+        if not result:
+            print('已经打卡过了吧？')
+        else:
+            print('下班打卡成功')
+        sys.exit(0)
