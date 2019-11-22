@@ -33,6 +33,9 @@ def parse(args):
     parser.add_argument('-m', '--module', type=import_class,
                         default='qinghi.User', help='action you can choice')
 
+    parser.add_argument('-u', '--user', help='login User account')
+    parser.add_argument('-p', '--password', help='user password')
+
     parser.add_argument('-c', '--config', help='where is config file')
     parser.add_argument('-a', '--action', help='Action for module')
     return parser.parse_args(args=args)
@@ -41,6 +44,11 @@ def parse(args):
 def main():
     namespace = parse(sys.argv[1:])
     config = Config(namespace.config)
+    if namespace.user:
+        config.mobilephone = namespace.user
+    if namespace.password:
+        config.password = namespace.password
+    
     qh = qinghi.Qinghi(widget=namespace.module,
                        action=namespace.action, config=config)
     qh.execute()
