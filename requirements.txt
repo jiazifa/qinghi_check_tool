@@ -1,0 +1,10 @@
+certifi==2019.11.28
+chardet==3.0.4
+idna==2.8
+mypy==0.761
+mypy-extensions==0.4.3
+-e git+https://github.com/jiazifa/qinghi_check_tool.git@fb40603db81f2607a385357a335bb94b03eb3080#egg=qinghi_tool
+requests==2.22.0
+typed-ast==1.4.0
+typing-extensions==3.7.4.1
+urllib3==1.25.7
