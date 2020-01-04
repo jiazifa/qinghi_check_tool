@@ -1,6 +1,6 @@
 #! -*- coding: utf-8 -*-
 
-from typing import AnyStr, Dict, Any, Optional
+from typing import Dict, Any, Optional
 from qinghi.config import Config
 
 
@@ -13,5 +13,5 @@ class Widget(object):
         params = kwargs.get('params')
         self.action(action, params)
 
-    def action(self, action: AnyStr, config: Optional[Config]):
+    def action(self, action: str, config: Optional[Config]):
         raise NotImplementedError

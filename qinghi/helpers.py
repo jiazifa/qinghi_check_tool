@@ -4,7 +4,7 @@ import random
 import os
 import json
 import sys
-from typing import Optional, List, Generator, Union, Pattern, Match, AnyStr, Dict, Any
+from typing import Optional, List, Generator, Union, Pattern, Match, Dict, Any
 import requests
 from qinghi.constant import BASE_URL
 
@@ -20,12 +20,12 @@ def is_type_check():  # type: () -> bool
 
 
 class _User(object):
-    __payload: Dict[AnyStr, Any] = {}
+    __payload: Dict[str, Any] = {}
 
-    def __getattr__(self, attr: AnyStr) -> Optional[Any]:
+    def __getattr__(self, attr: str) -> Optional[Any]:
         return self.__payload.get(attr)
 
-    def __setattr__(self, key: AnyStr, value: Optional[Any]):
+    def __setattr__(self, key: str, value: Optional[Any]):
         self.__payload.setdefault(key, value)
 
 
@@ -62,14 +62,14 @@ def platform() -> str:
     return random.choice(PLATFORM_IOS)
 
 
-def url_for(path: AnyStr, base: Optional[str] = None) -> AnyStr:
+def url_for(path: str, base: Optional[str] = None) -> str:
     url: str = base or BASE_URL
     url += path
     return url
 
 
-def header_for() -> Dict[AnyStr, AnyStr]:
-    headers: Dict[AnyStr, AnyStr] = {}
+def header_for() -> Dict[str, str]:
+    headers: Dict[str, str] = {}
     cookie: str = 'JSESSIONID={jsessionid};signature={signature};userId={userId}'.format(jsessionid=user_config.jsessionid, signature=user_config.signature, userId=user_config.userId)
     headers.update({'Cookie': cookie})
     headers.update({'Accept-Language': 'zh-Hans-CN;q=1, en-CN;q=0.9'})

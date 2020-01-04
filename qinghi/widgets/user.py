@@ -1,13 +1,13 @@
 #! -*- coding: utf-8 -*-
 import sys
-from typing import AnyStr, Dict, Any, Callable, Optional
+from typing import Dict, Any, Callable, Optional
 from . import Widget
 from qinghi.helpers import platform, url_for, session, user_config, header_for
 from qinghi.config import Config
 
 
 class User(Widget):
-    _actions: Dict[AnyStr, Any]
+    _actions: Dict[str, Any]
 
     def __init__(self):
         self._actions = {
@@ -16,8 +16,8 @@ class User(Widget):
             'checkout': self.check_out_work,
         }
 
-    def action(self, action: AnyStr, config: Optional[Config]):
-        act = self._actions.get(action)
+    def action(self, action: str, config: Optional[Config]):
+        act: Any = self._actions.get(action)
         act(config)
 
     def login(self, config: Config):
@@ -49,12 +49,15 @@ class User(Widget):
 
     def check_in_work(self, config: Config):
         self.login(config)
-        path: str = 'workCenter/createAutomaticSignForAttendance'
+        path: str = 'workCenter/createAttendance_744'
         target: str = url_for(path)
-        params: Dict[AnyStr, Any] = {
+        longitude: str = config.longitude or ""
+        latitude: str = config.latitude or ""
+
+        params: Dict[str, Any] = {
             'attendance': {
-                'longitude': float(config.longitude),
-                'latitude': float(config.latitude),
+                'longitude': float(longitude),
+                'latitude': float(latitude),
                 'attendanceAddress': config.address,
                 'type': 'startwork',
             },
@@ -63,24 +66,27 @@ class User(Widget):
         headers = header_for()
         print(target, headers, params)
         resp = session.post(target, json=params, headers=headers)
-        result: Dict[AnyStr, Any] = resp.json()
-        attendanceId: Optional[int] = result['attendanceId']
-        attendanceIsLate: bool = result['attendanceIsLate'] or False
-        result: bool = result['result'] or False
-        if not result:
+        result: Dict[str, Any] = resp.json()
+        print(result)
+        attendanceId: Optional[int] = result.get('attendanceId')
+        attendanceIsLate: bool = result.get('attendanceIsLate') or False
+        checked: bool = result.get('result') or False
+        if not checked:
             print('已经打卡过了吧？')
         else:
             print('上班打卡成功')
         sys.exit(0)
 
-    def check_out_work(self, config: Config) -> Dict[AnyStr, AnyStr]:
+    def check_out_work(self, config: Config) -> Dict[str, str]:
         self.login(config)
         path: str = 'workCenter/createAttendance_744'
         target: str = url_for(path)
-        params: Dict[AnyStr, Any] = {
+        longitude: str = config.longitude or ""
+        latitude: str = config.latitude or ""
+        params: Dict[str, Any] = {
             'attendance': {
-                'longitude': float(config.longitude),
-                'latitude': float(config.latitude),
+                'longitude': float(longitude),
+                'latitude': float(latitude),
                 'attendanceAddress': config.address,
                 'type': 'offwork',
             },
@@ -89,11 +95,11 @@ class User(Widget):
         headers = header_for()
         print(target, headers, params)
         resp = session.post(target, json=params, headers=headers)
-        result: Dict[AnyStr, Any] = resp.json()
+        result: Dict[str, Any] = resp.json()
         print(result)
-        attendanceId: Optional[int] = result['attendanceId']
-        result: bool = result['result'] or False
-        if not result:
+        attendanceId: Optional[int] = result.get('attendanceId')
+        checked: bool = result.get('result') or False
+        if not checked:
             print('已经打卡过了吧？')
         else:
             print('下班打卡成功')
