@@ -1,10 +1,12 @@
 #! -*- coding: utf-8 -*-
 import sys
+from collections import namedtuple
 from typing import Dict, Any, Callable, Optional
 from . import Widget
 from qinghi.helpers import platform, url_for, session, user_config, header_for
 from qinghi.config import Config
 
+AttendInfo = namedtuple('AttendInfo', ['offwork', 'onwork'])
 
 class User(Widget):
     _actions: Dict[str, Any]
@@ -14,6 +16,7 @@ class User(Widget):
             'login': self.login,
             'checkin': self.check_in_work,
             'checkout': self.check_out_work,
+            'nest': self.checkCurrentSign,
         }
 
     def action(self, action: str, config: Optional[Config]):
@@ -40,15 +43,24 @@ class User(Widget):
         user_config.username = result['user']['username']
         print(user_config.username)
 
-    def checkCurrentSign(self):
+    def checkCurrentSign(self, config: Config) -> AttendInfo:
+        self.login(config)
         path: str = 'mobileAttendance/nearestAttendanceSetting'
         target: str = url_for(path)
         resp = session.get(target, headers=header_for())
         result = resp.json()
-        print(result)
+        info: Dict[str, Any] = result.get('attendanceDouble') or {}
+        onwork: bool = True if info['onwork'] else False
+        offwork: bool = True if info['offwork'] else False
+        attend = AttendInfo(offwork, onwork)
+        return attend
 
     def check_in_work(self, config: Config):
-        self.login(config)
+        attend: AttendInfo = self.checkCurrentSign(config)
+        if attend.onwork:
+            print('已经打卡过了吧？')
+            sys.exit(0)
+            return
         path: str = 'workCenter/createAttendance_744'
         target: str = url_for(path)
         longitude: str = config.longitude or ""
