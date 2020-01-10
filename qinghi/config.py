@@ -13,7 +13,7 @@ LOCATIONS: List[Tuple[float, float, str]] = [
 class Config(object):
     _source_file: str
     _cf: ConfigParser
-    
+
     # User
     mobilephone: Optional[str]
     password: Optional[str]
@@ -26,7 +26,7 @@ class Config(object):
         self._cf = ConfigParser()
         self._cf.read(path)
         self.prepare()
-    
+
     def prepare(self):
         sections = self._cf.sections()
         self.mobilephone = self._cf.get('User', 'mobilephone')
