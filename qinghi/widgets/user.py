@@ -1,6 +1,7 @@
 #! -*- coding: utf-8 -*-
 import sys
 from collections import namedtuple
+import random
 from typing import Dict, Any, Callable, Optional
 from . import Widget
 from qinghi.helpers import platform, url_for, session, user_config, header_for
@@ -43,6 +44,7 @@ class User(Widget):
         user_config.username = result['user']['username']
         print(user_config.username)
 
+
     def checkCurrentSign(self, config: Config) -> AttendInfo:
         self.login(config)
         path: str = 'mobileAttendance/nearestAttendanceSetting'
@@ -55,6 +57,7 @@ class User(Widget):
         attend = AttendInfo(offwork, onwork)
         return attend
 
+
     def check_in_work(self, config: Config):
         attend: AttendInfo = self.checkCurrentSign(config)
         if attend.onwork:
@@ -65,7 +68,7 @@ class User(Widget):
         target: str = url_for(path)
         longitude: str = config.longitude or ""
         latitude: str = config.latitude or ""
-
+        distance: float = random.randint(1500000, 4300000) / 1000.0
         params: Dict[str, Any] = {
             'attendance': {
                 'longitude': float(longitude),
@@ -73,13 +76,12 @@ class User(Widget):
                 'attendanceAddress': config.address,
                 'type': 'startwork',
             },
-            'distance': float(300.8334)
+            'distance': distance
         }
         headers = header_for()
         print(target, headers, params)
         resp = session.post(target, json=params, headers=headers)
         result: Dict[str, Any] = resp.json()
-        print(result)
         attendanceId: Optional[int] = result.get('attendanceId')
         attendanceIsLate: bool = result.get('attendanceIsLate') or False
         checked: bool = result.get('result') or False
@@ -89,12 +91,14 @@ class User(Widget):
             print('上班打卡成功')
         sys.exit(0)
 
+
     def check_out_work(self, config: Config) -> Dict[str, str]:
         self.login(config)
         path: str = 'workCenter/createAttendance_744'
         target: str = url_for(path)
         longitude: str = config.longitude or ""
         latitude: str = config.latitude or ""
+        distance: float = random.randint(1500000, 4300000) / 1000.0
         params: Dict[str, Any] = {
             'attendance': {
                 'longitude': float(longitude),
@@ -102,7 +106,7 @@ class User(Widget):
                 'attendanceAddress': config.address,
                 'type': 'offwork',
             },
-            'distance': float(300.8334)
+            'distance': distance
         }
         headers = header_for()
         print(target, headers, params)
