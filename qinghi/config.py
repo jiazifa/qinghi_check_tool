@@ -21,11 +21,18 @@ class Config(object):
     longitude: Optional[str]
     address: Optional[str]
 
-    def __init__(self, path: str):
-        self._source_file = path
-        self._cf = ConfigParser()
-        self._cf.read(path)
-        self.prepare()
+    def __init__(self, path: Optional[str]):
+        if path:
+            self._source_file = path
+            self._cf = ConfigParser()
+            self._cf.read(path)
+            self.prepare()
+        else:
+            location: Tuple[float, float, str] = random.choice(LOCATIONS)
+            latitude, longitude, address = location
+            self.latitude = latitude
+            self.longitude = longitude
+            self.address = address
 
     def prepare(self):
         sections = self._cf.sections()
